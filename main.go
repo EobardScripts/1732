@@ -13,10 +13,14 @@ func main() {
 	var m = sync.RWMutex{}
 	var c = sync.NewCond(&m)
 	checker := func() {
+		//Заметил, что c.Signal() успевать вызваться 2 раза, то того как отработает c.Wait(), добавление break
+		// и defer m.RUnlock() решило эту проблему, не знаю на сколько это правильное решение
+		defer m.RUnlock()
 		for {
 			m.RLock()
 			if counter == interationAmount {
 				c.Signal()
+				break
 			}
 			m.RUnlock()
 		}
